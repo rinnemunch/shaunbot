@@ -9,9 +9,9 @@ class OllamaWorker(QThread):
     result_ready = pyqtSignal(str)
     error = pyqtSignal(str)
 
-    def __init__(self, user_input):
+    def __init__(self, conversation):
         super().__init__()
-        self.user_input = user_input
+        self.conversation = conversation
 
     def run(self):
         try:
@@ -19,9 +19,7 @@ class OllamaWorker(QThread):
                 "http://localhost:11434/api/chat",
                 json={
                     "model": "llama3",
-                    "messages": [
-                        {"role": "user", "content": self.user_input}
-                    ],
+                    "messages": self.conversation,
                     "stream": True
                 },
                 stream=True
@@ -42,6 +40,10 @@ class ShaunBot(QWidget):
     def __init__(self):
         super().__init__()
         self.worker = None
+        self.conversation = [
+            {"role": "system", "content": "You are Shaunbot, a helpful and chill AI assistant."}
+        ]
+
         self.setWindowTitle("Shaunbot 🤖")
         self.setGeometry(200, 200, 500, 600)
 
@@ -62,6 +64,7 @@ class ShaunBot(QWidget):
         self.layout.addWidget(self.send_button)
         self.setLayout(self.layout)
 
+
     def send_message(self):
         user_input = self.input_line.text().strip()
         if not user_input:
@@ -70,13 +73,15 @@ class ShaunBot(QWidget):
         self.chat_area.append(f"🧑 You: {user_input}")
         self.input_line.clear()
 
-        self.worker = OllamaWorker(user_input)
+        self.conversation.append({"role": "user", "content": user_input})
+        self.worker = OllamaWorker(self.conversation.copy())
         self.worker.result_ready.connect(self.handle_response)
         self.worker.error.connect(self.handle_error)
         self.worker.start()
 
     def handle_response(self, reply):
         self.chat_area.append(f"🤖 Shaunbot: {reply}\n")
+        self.conversation.append({"role": "assistant", "content": reply})
 
     def handle_error(self, error_msg):
         self.chat_area.append(f"❌ Error: {error_msg}")
