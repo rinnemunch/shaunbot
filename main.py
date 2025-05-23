@@ -1,12 +1,47 @@
 import sys
 import requests
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
 import json
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
+from PyQt5.QtCore import QThread, pyqtSignal
+
+
+class OllamaWorker(QThread):
+    result_ready = pyqtSignal(str)
+    error = pyqtSignal(str)
+
+    def __init__(self, user_input):
+        super().__init__()
+        self.user_input = user_input
+
+    def run(self):
+        try:
+            response = requests.post(
+                "http://localhost:11434/api/chat",
+                json={
+                    "model": "llama3",
+                    "messages": [
+                        {"role": "user", "content": self.user_input}
+                    ],
+                    "stream": True
+                },
+                stream=True
+            )
+
+            full_reply = ""
+            for line in response.iter_lines():
+                if line:
+                    data = json.loads(line.decode("utf-8"))
+                    full_reply += data.get("message", {}).get("content", "")
+            self.result_ready.emit(full_reply.strip())
+
+        except Exception as e:
+            self.error.emit(str(e))
 
 
 class ShaunBot(QWidget):
     def __init__(self):
         super().__init__()
+        self.worker = None
         self.setWindowTitle("Shaunbot 🤖")
         self.setGeometry(200, 200, 500, 600)
 
@@ -35,31 +70,16 @@ class ShaunBot(QWidget):
         self.chat_area.append(f"🧑 You: {user_input}")
         self.input_line.clear()
 
-        try:
-            response = requests.post(
-                "http://localhost:11434/api/chat",
-                json={
-                    "model": "llama3",
-                    "messages": [
-                        {"role": "user", "content": user_input}
-                    ],
-                    "stream": True
-                },
-                stream=True  # <-- this is key
-            )
+        self.worker = OllamaWorker(user_input)
+        self.worker.result_ready.connect(self.handle_response)
+        self.worker.error.connect(self.handle_error)
+        self.worker.start()
 
-            full_reply = ""
-            for line in response.iter_lines():
-                if line:
-                    chunk = line.decode("utf-8")
-                    if chunk.startswith("{"):
-                        data = json.loads(chunk)
-                        full_reply += data.get("message", {}).get("content", "")
+    def handle_response(self, reply):
+        self.chat_area.append(f"🤖 Shaunbot: {reply}\n")
 
-            self.chat_area.append(f"🤖 Shaunbot: {full_reply.strip()}\n")
-
-        except Exception as e:
-            self.chat_area.append(f"❌ Error: {e}")
+    def handle_error(self, error_msg):
+        self.chat_area.append(f"❌ Error: {error_msg}")
 
 
 if __name__ == "__main__":
