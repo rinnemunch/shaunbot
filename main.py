@@ -2,7 +2,7 @@ import sys
 import requests
 import json
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, QTimer
 
 
 class OllamaWorker(QThread):
@@ -64,7 +64,6 @@ class ShaunBot(QWidget):
         self.layout.addWidget(self.send_button)
         self.setLayout(self.layout)
 
-
     def send_message(self):
         user_input = self.input_line.text().strip()
         if not user_input:
@@ -80,8 +79,23 @@ class ShaunBot(QWidget):
         self.worker.start()
 
     def handle_response(self, reply):
-        self.chat_area.append(f"🤖 Shaunbot: {reply}\n")
+        self.current_reply = reply
+        self.typing_index = 0
+        self.chat_area.append("🤖 Shaunbot: ")
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.type_next_character)
+        self.timer.start(20)  # Adjustable typing speed for the bot
         self.conversation.append({"role": "assistant", "content": reply})
+
+    def type_next_character(self):
+        if self.typing_index < len(self.current_reply):
+            self.chat_area.moveCursor(self.chat_area.textCursor().End)
+            self.chat_area.insertPlainText(self.current_reply[self.typing_index])
+            self.typing_index += 1
+        else:
+            self.timer.stop()
+            self.chat_area.append("")  # Adds spacing after full reply
+
 
     def handle_error(self, error_msg):
         self.chat_area.append(f"❌ Error: {error_msg}")
