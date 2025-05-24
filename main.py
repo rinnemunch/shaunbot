@@ -59,10 +59,14 @@ class ShaunBot(QWidget):
         self.send_button = QPushButton("Send")
         self.send_button.clicked.connect(self.send_message)
 
+        self.clear_button = QPushButton("Clear Chat")
+        self.clear_button.clicked.connect(self.clear_chat)
+
         self.layout.addWidget(self.chat_area)
         self.layout.addWidget(self.input_line)
         self.layout.addWidget(self.send_button)
         self.setLayout(self.layout)
+        self.layout.addWidget(self.clear_button)
 
     def send_message(self):
         user_input = self.input_line.text().strip()
@@ -96,9 +100,14 @@ class ShaunBot(QWidget):
             self.timer.stop()
             self.chat_area.append("")  # Adds spacing after full reply
 
-
     def handle_error(self, error_msg):
         self.chat_area.append(f"❌ Error: {error_msg}")
+
+    def clear_chat(self):
+        self.chat_area.clear()
+        self.conversation = [
+            {"role": "system", "content": "You are Shaunbot, a helpful and chill AI assistant."}
+        ]
 
 
 if __name__ == "__main__":
