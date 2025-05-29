@@ -68,7 +68,6 @@ class ShaunBot(QWidget):
         self.layout.addWidget(self.chat_area)
         self.layout.addWidget(self.input_line)
         self.layout.addWidget(self.send_button)
-        self.setLayout(self.layout)
         self.layout.addWidget(self.clear_button)
 
         self.knowledge_data = ""
@@ -76,6 +75,8 @@ class ShaunBot(QWidget):
         self.load_button = QPushButton("Load Knowledge File")
         self.load_button.clicked.connect(self.load_knowledge_file)
         self.layout.addWidget(self.load_button)
+
+        self.setLayout(self.layout)
 
     def send_message(self):
         user_input = self.input_line.text().strip()
