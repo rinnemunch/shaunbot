@@ -40,6 +40,9 @@ class OllamaWorker(QThread):
 class ShaunBot(QWidget):
     def __init__(self):
         super().__init__()
+        self.timer = None
+        self.typing_index = None
+        self.current_reply = None
         self.worker = None
         self.conversation = [
             {"role": "system", "content": "You are Shaunbot, a helpful and chill AI assistant."}
@@ -126,12 +129,16 @@ class ShaunBot(QWidget):
         self.worker.start()
 
     def handle_response(self, reply):
+        if not reply.strip():
+            self.chat_area.append("🤖 Shaunbot had nothing to say.")
+            return
+
         self.current_reply = reply
         self.typing_index = 0
         self.chat_area.append("🤖 Shaunbot: ")
         self.timer = QTimer()
         self.timer.timeout.connect(self.type_next_character)
-        self.timer.start(20)  # Adjustable typing speed for the bot
+        self.timer.start(20)
         self.conversation.append({"role": "assistant", "content": reply})
 
     def type_next_character(self):
