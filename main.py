@@ -3,6 +3,8 @@ import requests
 import json
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
+from PyQt5.QtWidgets import QFileDialog
+
 
 
 class OllamaWorker(QThread):
@@ -12,6 +14,7 @@ class OllamaWorker(QThread):
     def __init__(self, conversation):
         super().__init__()
         self.conversation = conversation
+
 
     def run(self):
         try:
@@ -68,6 +71,12 @@ class ShaunBot(QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.clear_button)
 
+        self.knowledge_data = ""
+
+        self.load_button = QPushButton("Load Knowledge File")
+        self.load_button.clicked.connect(self.load_knowledge_file)
+        self.layout.addWidget(self.load_button)
+
     def send_message(self):
         user_input = self.input_line.text().strip()
         if not user_input:
@@ -76,7 +85,19 @@ class ShaunBot(QWidget):
         self.chat_area.append(f"🧑 You: {user_input}")
         self.input_line.clear()
 
+        # Inject file knowledge if it exists
+        if self.knowledge_data:
+            system_prompt = (
+                    "You are Shaunbot, a helpful and chill AI assistant. Use the following knowledge to help answer questions:\n\n"
+                    + self.knowledge_data
+            )
+        else:
+            system_prompt = "You are Shaunbot, a helpful and chill AI assistant."
+
+        # Reset base system prompt before each run
+        self.conversation[0] = {"role": "system", "content": system_prompt}
         self.conversation.append({"role": "user", "content": user_input})
+
         self.worker = OllamaWorker(self.conversation.copy())
         self.worker.result_ready.connect(self.handle_response)
         self.worker.error.connect(self.handle_error)
@@ -108,6 +129,16 @@ class ShaunBot(QWidget):
         self.conversation = [
             {"role": "system", "content": "You are Shaunbot, a helpful and chill AI assistant."}
         ]
+
+    def load_knowledge_file(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt *.md)")
+        if file_path:
+            try:
+                with open(file_path, "r", encoding="utf-8") as file:
+                    self.knowledge_data = file.read()
+                self.chat_area.append(f"📚 Knowledge file loaded: {file_path.split('/')[-1]}")
+            except Exception as e:
+                self.chat_area.append(f"❌ Failed to load file: {e}")
 
 
 if __name__ == "__main__":
