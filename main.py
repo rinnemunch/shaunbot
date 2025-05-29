@@ -6,6 +6,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QTimer
 from PyQt5.QtWidgets import QFileDialog, QHBoxLayout, QComboBox
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
 
 
 
@@ -68,6 +69,13 @@ class ShaunBot(QWidget):
         self.character_label.setStyleSheet("border: 2px solid black; border-radius: 10px;")
         self.character_label.setAlignment(Qt.AlignCenter)
         self.character_layout.addWidget(self.character_label)
+
+        self.character_label.setPixmap(QPixmap("shaun.png").scaled(
+            self.character_label.width(),
+            self.character_label.height(),
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation
+        ))
 
         # --- Sidebar Widgets ---
         self.save_button = QPushButton("Save Chat")
