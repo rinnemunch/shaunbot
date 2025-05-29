@@ -1,13 +1,15 @@
 import sys
-import requests
 import json
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
-from PyQt5.QtCore import QThread, pyqtSignal, QTimer
-from PyQt5.QtWidgets import QFileDialog, QHBoxLayout, QComboBox
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+import requests
+from pathlib import Path
 
+from PyQt5.QtCore import Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout,
+    QTextEdit, QLineEdit, QPushButton, QFileDialog,
+    QComboBox, QLabel
+)
 
 
 class OllamaWorker(QThread):
