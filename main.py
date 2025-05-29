@@ -89,15 +89,16 @@ class ShaunBot(QWidget):
         title_label = QLabel("Shaunbot")
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setStyleSheet("font-weight: bold; font-size: 16px; margin-bottom: 10px;")
-        self.sidebar_layout.addWidget(title_label, alignment=Qt.AlignHCenter)
-        self.sidebar_layout.addStretch()
 
+        self.sidebar_layout.addWidget(title_label)
         self.sidebar_layout.addWidget(self.save_button)
         self.sidebar_layout.addWidget(self.load_chat_button)
         self.sidebar_layout.addWidget(self.load_button)
         self.sidebar_layout.addWidget(self.mode_selector)
         self.sidebar_layout.addWidget(self.model_selector)
         self.sidebar_layout.addWidget(self.clear_button)
+
+        self.sidebar_layout.addStretch()  # This pushes everything above to the top
 
         # --- Chat Area ---
         self.chat_area = QTextEdit()
