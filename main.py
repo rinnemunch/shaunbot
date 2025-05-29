@@ -4,6 +4,9 @@ import json
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
 from PyQt5.QtWidgets import QFileDialog, QHBoxLayout, QComboBox
+from PyQt5.QtWidgets import QLabel
+from PyQt5.QtCore import Qt
+
 
 
 class OllamaWorker(QThread):
@@ -80,6 +83,11 @@ class ShaunBot(QWidget):
 
         self.clear_button = QPushButton("Clear Chat")
         self.clear_button.clicked.connect(self.clear_chat)
+
+        title_label = QLabel("Shaunbot 🤖")
+        title_label.setAlignment(Qt.AlignCenter)
+        title_label.setStyleSheet("font-weight: bold; font-size: 16px; margin-bottom: 10px;")
+        self.sidebar_layout.addWidget(title_label)
 
         self.sidebar_layout.addWidget(self.save_button)
         self.sidebar_layout.addWidget(self.load_chat_button)
