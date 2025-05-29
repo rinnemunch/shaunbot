@@ -46,6 +46,27 @@ class OllamaWorker(QThread):
 class ShaunBot(QWidget):
     def __init__(self):
         super().__init__()
+        self.character_layout = None
+        self.chat_layout = None
+        self.sidebar_layout = None
+        self.character_label = None
+        self.main_layout = None
+        self.send_button = None
+        self.input_line = None
+        self.chat_area = None
+        self.title_label = None
+        self.clear_button = None
+        self.model_selector = None
+        self.mode_selector = None
+        self.load_button = None
+        self.load_chat_button = None
+        self.save_button = None
+        self.knowledge_data = None
+        self.conversation = None
+        self.worker = None
+        self.current_reply = None
+        self.typing_index = None
+        self.timer = None
         self.setup_variables()
         self.setup_ui()
         self.setup_layout()
@@ -147,7 +168,6 @@ class ShaunBot(QWidget):
         self.main_layout.addLayout(self.sidebar_layout, 1)
         self.main_layout.addLayout(chat_wrapper, 5)
         self.setLayout(self.main_layout)
-
 
     def send_message(self):
         user_input = self.input_line.text().strip()
