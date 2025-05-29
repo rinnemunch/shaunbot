@@ -44,25 +44,29 @@ class ShaunBot(QWidget):
         self.typing_index = None
         self.current_reply = None
         self.worker = None
+        self.knowledge_data = ""
         self.conversation = [
             {"role": "system", "content": "You are Shaunbot, a helpful and chill AI assistant."}
         ]
 
+        self.setWindowTitle("Shaunbot 🤖")
+        self.setGeometry(200, 200, 800, 600)
+
+        # Layouts
+        self.main_layout = QHBoxLayout()
+        self.sidebar_layout = QVBoxLayout()
+        self.chat_layout = QVBoxLayout()
+
+        # --- Sidebar Widgets ---
         self.save_button = QPushButton("Save Chat")
         self.save_button.clicked.connect(self.save_chat)
 
         self.load_chat_button = QPushButton("Load Chat")
         self.load_chat_button.clicked.connect(self.load_chat)
 
-        self.setWindowTitle("Shaunbot 🤖")
-        self.setGeometry(200, 200, 500, 600)
+        self.load_button = QPushButton("Load Knowledge File")
+        self.load_button.clicked.connect(self.load_knowledge_file)
 
-        self.layout = QVBoxLayout()
-
-        self.chat_area = QTextEdit()
-        self.chat_area.setReadOnly(True)
-
-        # Different personalities
         self.mode_selector = QComboBox()
         self.mode_selector.addItems([
             "Chill Mode 😎",
@@ -70,7 +74,23 @@ class ShaunBot(QWidget):
             "Motivator 💪",
             "Dad Joke Bot 👴"
         ])
-        self.layout.addWidget(self.mode_selector)
+
+        self.model_selector = QComboBox()
+        self.model_selector.addItems(["llama3", "mistral", "llama2"])
+
+        self.clear_button = QPushButton("Clear Chat")
+        self.clear_button.clicked.connect(self.clear_chat)
+
+        self.sidebar_layout.addWidget(self.save_button)
+        self.sidebar_layout.addWidget(self.load_chat_button)
+        self.sidebar_layout.addWidget(self.load_button)
+        self.sidebar_layout.addWidget(self.mode_selector)
+        self.sidebar_layout.addWidget(self.model_selector)
+        self.sidebar_layout.addWidget(self.clear_button)
+
+        # --- Chat Area ---
+        self.chat_area = QTextEdit()
+        self.chat_area.setReadOnly(True)
 
         self.input_line = QLineEdit()
         self.input_line.setPlaceholderText("Ask Shaunbot something...")
@@ -79,35 +99,18 @@ class ShaunBot(QWidget):
         self.send_button = QPushButton("Send")
         self.send_button.clicked.connect(self.send_message)
 
-        self.clear_button = QPushButton("Clear Chat")
-        self.clear_button.clicked.connect(self.clear_chat)
+        self.chat_layout.addWidget(self.chat_area)
+        self.chat_layout.addWidget(self.input_line)
 
-        self.layout.addWidget(self.chat_area)
-        self.layout.addWidget(self.input_line)
+        send_row = QHBoxLayout()
+        send_row.addWidget(self.send_button)
+        self.chat_layout.addLayout(send_row)
 
-        # Row 1: Send + Clear
-        row1 = QHBoxLayout()
-        row1.addWidget(self.send_button)
-        row1.addWidget(self.clear_button)
-        self.layout.addLayout(row1)
+        # --- Final Layout Assembly ---
+        self.main_layout.addLayout(self.sidebar_layout, 1)  # Weight: 1 (narrow sidebar)
+        self.main_layout.addLayout(self.chat_layout, 4)  # Weight: 4 (main area)
 
-        # Row 2: Save + Load Chat
-        row2 = QHBoxLayout()
-        row2.addWidget(self.save_button)
-        row2.addWidget(self.load_chat_button)
-        self.layout.addLayout(row2)
-
-        self.load_button = QPushButton("Load Knowledge File")
-        self.load_button.clicked.connect(self.load_knowledge_file)
-
-        # Row 3: Load Knowledge File
-        row3 = QHBoxLayout()
-        row3.addWidget(self.load_button)
-        self.layout.addLayout(row3)
-
-        self.knowledge_data = ""
-
-        self.setLayout(self.layout)
+        self.setLayout(self.main_layout)
 
     def send_message(self):
         user_input = self.input_line.text().strip()
