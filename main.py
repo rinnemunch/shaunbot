@@ -62,6 +62,13 @@ class ShaunBot(QWidget):
         self.sidebar_layout.setSpacing(8)
         self.chat_layout = QVBoxLayout()
 
+        self.character_layout = QVBoxLayout()
+        self.character_label = QLabel()
+        self.character_label.setFixedSize(150, 150)  # adjustable for logo image
+        self.character_label.setStyleSheet("border: 2px solid black; border-radius: 10px;")
+        self.character_label.setAlignment(Qt.AlignCenter)
+        self.character_layout.addWidget(self.character_label)
+
         # --- Sidebar Widgets ---
         self.save_button = QPushButton("Save Chat")
         self.save_button.clicked.connect(self.save_chat)
@@ -119,8 +126,17 @@ class ShaunBot(QWidget):
         self.chat_layout.addLayout(send_row)
 
         # --- Final Layout Assembly ---
-        self.main_layout.addLayout(self.sidebar_layout, 1)  # Weight: 1 (narrow sidebar)
-        self.main_layout.addLayout(self.chat_layout, 4)  # Weight: 4 (main area)
+
+        chat_wrapper = QHBoxLayout()
+        chat_wrapper.addLayout(self.chat_layout, 4)
+
+        character_wrapper = QVBoxLayout()
+        character_wrapper.addLayout(self.character_layout)
+        character_wrapper.addStretch()
+        chat_wrapper.addLayout(character_wrapper, 2)
+
+        self.main_layout.addLayout(self.sidebar_layout, 1)
+        self.main_layout.addLayout(chat_wrapper, 5)
 
         self.setLayout(self.main_layout)
 
