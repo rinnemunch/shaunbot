@@ -46,6 +46,11 @@ class OllamaWorker(QThread):
 class ShaunBot(QWidget):
     def __init__(self):
         super().__init__()
+        self.setup_variables()
+        self.setup_ui()
+        self.setup_layout()
+
+    def setup_variables(self):
         self.timer = None
         self.typing_index = None
         self.current_reply = None
@@ -55,31 +60,11 @@ class ShaunBot(QWidget):
             {"role": "system", "content": "You are Shaunbot, a helpful and chill AI assistant."}
         ]
 
+    def setup_ui(self):
         self.setWindowTitle("Shaunbot 🤖")
         self.setGeometry(200, 200, 800, 600)
 
-        # Layouts
-        self.main_layout = QHBoxLayout()
-        self.sidebar_layout = QVBoxLayout()
-        self.sidebar_layout.setContentsMargins(0, 0, 0, 0)
-        self.sidebar_layout.setSpacing(8)
-        self.chat_layout = QVBoxLayout()
-
-        self.character_layout = QVBoxLayout()
-        self.character_label = QLabel()
-        self.character_label.setFixedSize(150, 150)  # adjustable for logo image
-        self.character_label.setStyleSheet("border: 2px solid black; border-radius: 10px;")
-        self.character_label.setAlignment(Qt.AlignCenter)
-        self.character_layout.addWidget(self.character_label)
-
-        self.character_label.setPixmap(QPixmap("shaun.png").scaled(
-            self.character_label.width(),
-            self.character_label.height(),
-            Qt.KeepAspectRatio,
-            Qt.SmoothTransformation
-        ))
-
-        # --- Sidebar Widgets ---
+        # Sidebar widgets
         self.save_button = QPushButton("Save Chat")
         self.save_button.clicked.connect(self.save_chat)
 
@@ -91,10 +76,7 @@ class ShaunBot(QWidget):
 
         self.mode_selector = QComboBox()
         self.mode_selector.addItems([
-            "Chill Mode 😎",
-            "Tech Support 🛠️",
-            "Motivator 💪",
-            "Dad Joke Bot 👴"
+            "Chill Mode 😎", "Tech Support 🛠️", "Motivator 💪", "Dad Joke Bot 👴"
         ])
 
         self.model_selector = QComboBox()
@@ -103,21 +85,11 @@ class ShaunBot(QWidget):
         self.clear_button = QPushButton("Clear Chat")
         self.clear_button.clicked.connect(self.clear_chat)
 
-        title_label = QLabel("Shaunbot")
-        title_label.setAlignment(Qt.AlignCenter)
-        title_label.setStyleSheet("font-weight: bold; font-size: 16px; margin-bottom: 10px;")
+        self.title_label = QLabel("Shaunbot")
+        self.title_label.setAlignment(Qt.AlignCenter)
+        self.title_label.setStyleSheet("font-weight: bold; font-size: 16px; margin-bottom: 10px;")
 
-        self.sidebar_layout.addWidget(title_label)
-        self.sidebar_layout.addWidget(self.save_button)
-        self.sidebar_layout.addWidget(self.load_chat_button)
-        self.sidebar_layout.addWidget(self.load_button)
-        self.sidebar_layout.addWidget(self.mode_selector)
-        self.sidebar_layout.addWidget(self.model_selector)
-        self.sidebar_layout.addWidget(self.clear_button)
-
-        self.sidebar_layout.addStretch()  # This pushes everything above to the top
-
-        # --- Chat Area ---
+        # Chat
         self.chat_area = QTextEdit()
         self.chat_area.setReadOnly(True)
 
@@ -128,27 +100,54 @@ class ShaunBot(QWidget):
         self.send_button = QPushButton("Send")
         self.send_button.clicked.connect(self.send_message)
 
+        # Character image
+        self.character_label = QLabel()
+        self.character_label.setFixedSize(150, 150)
+        self.character_label.setStyleSheet("border: 2px solid black; border-radius: 10px;")
+        self.character_label.setAlignment(Qt.AlignCenter)
+        self.character_label.setPixmap(QPixmap("shaun.png").scaled(
+            self.character_label.width(),
+            self.character_label.height(),
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation
+        ))
+
+    def setup_layout(self):
+        # Layouts
+        self.main_layout = QHBoxLayout()
+        self.sidebar_layout = QVBoxLayout()
+        self.sidebar_layout.setContentsMargins(0, 0, 0, 0)
+        self.sidebar_layout.setSpacing(8)
+
+        self.chat_layout = QVBoxLayout()
         self.chat_layout.addWidget(self.chat_area)
         self.chat_layout.addWidget(self.input_line)
-
         send_row = QHBoxLayout()
         send_row.addWidget(self.send_button)
         self.chat_layout.addLayout(send_row)
 
-        # --- Final Layout Assembly ---
+        self.sidebar_layout.addWidget(self.title_label)
+        self.sidebar_layout.addWidget(self.save_button)
+        self.sidebar_layout.addWidget(self.load_chat_button)
+        self.sidebar_layout.addWidget(self.load_button)
+        self.sidebar_layout.addWidget(self.mode_selector)
+        self.sidebar_layout.addWidget(self.model_selector)
+        self.sidebar_layout.addWidget(self.clear_button)
+        self.sidebar_layout.addStretch()
+
+        # Character box
+        self.character_layout = QVBoxLayout()
+        self.character_layout.addWidget(self.character_label)
+        self.character_layout.addStretch()
 
         chat_wrapper = QHBoxLayout()
         chat_wrapper.addLayout(self.chat_layout, 4)
-
-        character_wrapper = QVBoxLayout()
-        character_wrapper.addLayout(self.character_layout)
-        character_wrapper.addStretch()
-        chat_wrapper.addLayout(character_wrapper, 2)
+        chat_wrapper.addLayout(self.character_layout, 2)
 
         self.main_layout.addLayout(self.sidebar_layout, 1)
         self.main_layout.addLayout(chat_wrapper, 5)
-
         self.setLayout(self.main_layout)
+
 
     def send_message(self):
         user_input = self.input_line.text().strip()
