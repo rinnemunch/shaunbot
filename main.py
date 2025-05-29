@@ -3,8 +3,7 @@ import requests
 import json
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
-from PyQt5.QtWidgets import QFileDialog
-
+from PyQt5.QtWidgets import QFileDialog, QHBoxLayout
 
 
 class OllamaWorker(QThread):
@@ -14,7 +13,6 @@ class OllamaWorker(QThread):
     def __init__(self, conversation):
         super().__init__()
         self.conversation = conversation
-
 
     def run(self):
         try:
@@ -73,16 +71,29 @@ class ShaunBot(QWidget):
 
         self.layout.addWidget(self.chat_area)
         self.layout.addWidget(self.input_line)
-        self.layout.addWidget(self.send_button)
-        self.layout.addWidget(self.clear_button)
 
-        self.layout.addWidget(self.save_button)
-        self.layout.addWidget(self.load_chat_button)
+        # Row 1: Send + Clear
+        row1 = QHBoxLayout()
+        row1.addWidget(self.send_button)
+        row1.addWidget(self.clear_button)
+        self.layout.addLayout(row1)
 
-        self.knowledge_data = ""
+        # Row 2: Save + Load Chat
+        row2 = QHBoxLayout()
+        row2.addWidget(self.save_button)
+        row2.addWidget(self.load_chat_button)
+        self.layout.addLayout(row2)
 
         self.load_button = QPushButton("Load Knowledge File")
         self.load_button.clicked.connect(self.load_knowledge_file)
+
+        # Row 3: Load Knowledge File
+        row3 = QHBoxLayout()
+        row3.addWidget(self.load_button)
+        self.layout.addLayout(row3)
+
+        self.knowledge_data = ""
+
         self.layout.addWidget(self.load_button)
 
         self.setLayout(self.layout)
