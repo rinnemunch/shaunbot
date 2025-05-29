@@ -136,10 +136,12 @@ class ShaunBot(QWidget):
         if file_path:
             try:
                 with open(file_path, "r", encoding="utf-8") as file:
-                    self.knowledge_data = file.read()
+                    raw_text = file.read()
+                    max_chars = 3000
+                    self.knowledge_data = raw_text[:max_chars]
                 file_name = file_path.split("/")[-1]
                 char_count = len(self.knowledge_data)
-                self.chat_area.append(f"📚 Loaded: {file_name} ({char_count} characters)")
+                self.chat_area.append(f"📚 Loaded: {file_name} (trimmed to {char_count} characters)")
             except Exception as e:
                 self.chat_area.append(f"❌ Failed to load file: {e}")
 
