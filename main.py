@@ -3,7 +3,7 @@ import requests
 import json
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
-from PyQt5.QtWidgets import QFileDialog, QHBoxLayout
+from PyQt5.QtWidgets import QFileDialog, QHBoxLayout, QComboBox
 
 
 class OllamaWorker(QThread):
@@ -62,6 +62,16 @@ class ShaunBot(QWidget):
         self.chat_area = QTextEdit()
         self.chat_area.setReadOnly(True)
 
+        # Different personalities
+        self.mode_selector = QComboBox()
+        self.mode_selector.addItems([
+            "Chill Mode 😎",
+            "Tech Support 🛠️",
+            "Motivator 💪",
+            "Dad Joke Bot 👴"
+        ])
+        self.layout.addWidget(self.mode_selector)
+
         self.input_line = QLineEdit()
         self.input_line.setPlaceholderText("Ask Shaunbot something...")
         self.input_line.returnPressed.connect(self.send_message)
@@ -97,8 +107,6 @@ class ShaunBot(QWidget):
 
         self.knowledge_data = ""
 
-        self.layout.addWidget(self.load_button)
-
         self.setLayout(self.layout)
 
     def send_message(self):
@@ -109,15 +117,24 @@ class ShaunBot(QWidget):
         self.chat_area.append(f"🧑 You: {user_input}")
         self.input_line.clear()
 
-        # Inject file knowledge if it exists
-        if self.knowledge_data:
-            system_prompt = (
-                    "You are Shaunbot, a helpful and chill AI assistant. Use the following knowledge to help answer "
-                    "questions:\n\n"
-                    + self.knowledge_data
-            )
+        mode = self.mode_selector.currentText()
+
+        if mode == "Chill Mode 😎":
+            base_prompt = "You are Shaunbot, a helpful and chill AI assistant."
+        elif mode == "Tech Support 🛠️":
+            base_prompt = "You are Shaunbot, a focused tech support assistant. Answer questions in a concise, technical way."
+        elif mode == "Motivator 💪":
+            base_prompt = "You are Shaunbot, a motivational coach who always encourages the user with high energy."
+        elif mode == "Dad Joke Bot 👴":
+            base_prompt = "You are Shaunbot, a corny dad joke machine who always includes a pun in your answers."
         else:
-            system_prompt = "You are Shaunbot, a helpful and chill AI assistant."
+            base_prompt = "You are Shaunbot, a helpful and chill AI assistant."
+
+        # Add knowledge if present (Ive only tested txt files)
+        if self.knowledge_data:
+            system_prompt = f"{base_prompt}\n\nUse the following knowledge:\n{self.knowledge_data}"
+        else:
+            system_prompt = base_prompt
 
         # Reset base system prompt before each run
         self.conversation[0] = {"role": "system", "content": system_prompt}
