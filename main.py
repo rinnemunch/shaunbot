@@ -116,6 +116,7 @@ class ShaunBot(QWidget):
 
         self.chat_area.append(f"🧑 You: {user_input}")
         self.input_line.clear()
+        self.chat_area.append("<i>🤖 Shaunbot is typing...</i>")
 
         mode = self.mode_selector.currentText()
 
@@ -146,6 +147,14 @@ class ShaunBot(QWidget):
         self.worker.start()
 
     def handle_response(self, reply):
+
+        cursor = self.chat_area.textCursor()
+        cursor.movePosition(cursor.End)
+        cursor.select(cursor.BlockUnderCursor)
+        if "<i>🤖 Shaunbot is typing...</i>" in cursor.selectedText():
+            cursor.removeSelectedText()
+            cursor.deletePreviousChar()
+
         if not reply.strip():
             self.chat_area.append("🤖 Shaunbot had nothing to say.")
             return
