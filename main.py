@@ -47,6 +47,12 @@ class ShaunBot(QWidget):
             {"role": "system", "content": "You are Shaunbot, a helpful and chill AI assistant."}
         ]
 
+        self.save_button = QPushButton("Save Chat")
+        self.save_button.clicked.connect(self.save_chat)
+
+        self.load_chat_button = QPushButton("Load Chat")
+        self.load_chat_button.clicked.connect(self.load_chat)
+
         self.setWindowTitle("Shaunbot 🤖")
         self.setGeometry(200, 200, 500, 600)
 
@@ -70,6 +76,9 @@ class ShaunBot(QWidget):
         self.layout.addWidget(self.send_button)
         self.layout.addWidget(self.clear_button)
 
+        self.layout.addWidget(self.save_button)
+        self.layout.addWidget(self.load_chat_button)
+
         self.knowledge_data = ""
 
         self.load_button = QPushButton("Load Knowledge File")
@@ -89,7 +98,8 @@ class ShaunBot(QWidget):
         # Inject file knowledge if it exists
         if self.knowledge_data:
             system_prompt = (
-                    "You are Shaunbot, a helpful and chill AI assistant. Use the following knowledge to help answer questions:\n\n"
+                    "You are Shaunbot, a helpful and chill AI assistant. Use the following knowledge to help answer "
+                    "questions:\n\n"
                     + self.knowledge_data
             )
         else:
@@ -144,6 +154,35 @@ class ShaunBot(QWidget):
                 self.chat_area.append(f"📚 Loaded: {file_name} (trimmed to {char_count} characters)")
             except Exception as e:
                 self.chat_area.append(f"❌ Failed to load file: {e}")
+
+    def save_chat(self):
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save Chat", "", "JSON Files (*.json)")
+        if file_path:
+            try:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    json.dump(self.conversation, f, indent=2)
+                self.chat_area.append(f"💾 Chat saved to: {file_path.split('/')[-1]}")
+            except Exception as e:
+                self.chat_area.append(f"❌ Failed to save chat: {e}")
+
+    def load_chat(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Load Chat", "", "JSON Files (*.json)")
+        if file_path:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    self.conversation = json.load(f)
+
+                self.chat_area.clear()
+                for msg in self.conversation:
+                    role = msg["role"]
+                    content = msg["content"]
+                    if role == "user":
+                        self.chat_area.append(f"🧑 You: {content}")
+                    elif role == "assistant":
+                        self.chat_area.append(f"🤖 Shaunbot: {content}")
+                self.chat_area.append(f"📂 Chat loaded from: {file_path.split('/')[-1]}")
+            except Exception as e:
+                self.chat_area.append(f"❌ Failed to load chat: {e}")
 
 
 if __name__ == "__main__":
