@@ -46,6 +46,8 @@ class OllamaWorker(QThread):
 class ShaunBot(QWidget):
     def __init__(self):
         super().__init__()
+        self.history_window = None
+        self.history_button = None
         self.character_layout = None
         self.chat_layout = None
         self.sidebar_layout = None
@@ -106,6 +108,9 @@ class ShaunBot(QWidget):
         self.clear_button = QPushButton("Clear Chat")
         self.clear_button.clicked.connect(self.clear_chat)
 
+        self.history_button = QPushButton("View History")
+        self.history_button.clicked.connect(self.show_history)
+
         self.title_label = QLabel("Shaunbot")
         self.title_label.setAlignment(Qt.AlignCenter)
         self.title_label.setStyleSheet("font-weight: bold; font-size: 16px; margin-bottom: 10px;")
@@ -154,6 +159,7 @@ class ShaunBot(QWidget):
         self.sidebar_layout.addWidget(self.mode_selector)
         self.sidebar_layout.addWidget(self.model_selector)
         self.sidebar_layout.addWidget(self.clear_button)
+        self.sidebar_layout.addWidget(self.history_button)
         self.sidebar_layout.addStretch()
 
         # Character box
@@ -287,6 +293,29 @@ class ShaunBot(QWidget):
                 self.chat_area.append(f"📂 Chat loaded from: {file_path.split('/')[-1]}")
             except Exception as e:
                 self.chat_area.append(f"❌ Failed to load chat: {e}")
+
+    def show_history(self):
+        if self.history_window is None or not self.history_window.isVisible():
+            self.history_window = QWidget()
+            self.history_window.setWindowTitle("Shaunbot – Response History")
+            self.history_window.setGeometry(300, 300, 500, 400)
+
+            layout = QVBoxLayout()
+            history_box = QTextEdit()
+            history_box.setReadOnly(True)
+
+            replies = [msg["content"] for msg in self.conversation if msg["role"] == "assistant"]
+            if replies:
+                history_box.setPlainText("\n\n".join([f"🧠 {i + 1}. {text}" for i, text in enumerate(replies)]))
+            else:
+                history_box.setPlainText("No responses yet.")
+
+            layout.addWidget(history_box)
+            self.history_window.setLayout(layout)
+            self.history_window.show()
+        else:
+            self.history_window.raise_()
+            self.history_window.activateWindow()
 
 
 if __name__ == "__main__":
