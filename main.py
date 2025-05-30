@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (
 class ShaunBot(QWidget):
     def __init__(self):
         super().__init__()
+        self.theme_button = None
         self.history_window = None
         self.history_button = None
         self.character_layout = None
@@ -83,6 +84,7 @@ class ShaunBot(QWidget):
         self.history_button = buttons["history"]
         self.mode_selector = buttons["mode"]
         self.model_selector = buttons["model"]
+        self.theme_button = buttons["theme"]
 
         self.clear_button = QPushButton("Clear Chat")
         self.clear_button.clicked.connect(self.clear_chat)
@@ -139,6 +141,7 @@ class ShaunBot(QWidget):
         self.sidebar_layout.addWidget(self.model_selector)
         self.sidebar_layout.addWidget(self.clear_button)
         self.sidebar_layout.addWidget(self.history_button)
+        self.sidebar_layout.addWidget(self.theme_button)
         self.sidebar_layout.addStretch()
 
         # Character box
@@ -295,6 +298,35 @@ class ShaunBot(QWidget):
         else:
             self.history_window.raise_()
             self.history_window.activateWindow()
+
+    def toggle_theme(self):
+        if self.styleSheet() == "":
+            self.setStyleSheet("""
+                QWidget {
+                    background-color: #1e1e1e;
+                    color: #f0f0f0;
+                }
+                QTextEdit, QLineEdit {
+                    background-color: #2d2d2d;
+                    color: #ffffff;
+                    border: 1px solid #555;
+                }
+                QPushButton {
+                    background-color: #3a3a3a;
+                    color: white;
+                    border: none;
+                    padding: 6px;
+                }
+                QPushButton:hover {
+                    background-color: #555;
+                }
+                QComboBox {
+                    background-color: #2d2d2d;
+                    color: white;
+                }
+            """)
+        else:
+            self.setStyleSheet("")
 
 
 if __name__ == "__main__":

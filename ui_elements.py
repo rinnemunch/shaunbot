@@ -18,8 +18,8 @@ def create_sidebar_buttons(bot):
     history_btn = QPushButton("View History")
     history_btn.clicked.connect(bot.show_history)
 
-    # theme_btn = QPushButton("Toggle Theme")
-    # theme_btn.clicked.connect(bot.toggle_theme)
+    theme_btn = QPushButton("Toggle Theme")
+    theme_btn.clicked.connect(bot.toggle_theme)
 
     # ComboBoxes
     mode_selector = QComboBox()
@@ -36,7 +36,7 @@ def create_sidebar_buttons(bot):
         "load_knowledge": load_knowledge_btn,
         "clear": clear_btn,
         "history": history_btn,
-        # "theme": theme_btn,
+        "theme": theme_btn,
         "mode": mode_selector,
         "model": model_selector
     }
