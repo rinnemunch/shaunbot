@@ -2,6 +2,7 @@ import sys
 import json
 from pathlib import Path
 from worker import OllamaWorker
+from PyQt5.QtGui import QFont
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap
@@ -289,6 +290,10 @@ class ShaunBot(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+
+    app.setFont(QFont("Roboto", 11))
+
     window = ShaunBot()
     window.show()
     sys.exit(app.exec_())
