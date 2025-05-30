@@ -1,46 +1,15 @@
 import sys
 import json
-import requests
 from pathlib import Path
+from worker import OllamaWorker
 
-from PyQt5.QtCore import Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,
     QTextEdit, QLineEdit, QPushButton, QFileDialog,
     QComboBox, QLabel
 )
-
-
-class OllamaWorker(QThread):
-    result_ready = pyqtSignal(str)
-    error = pyqtSignal(str)
-
-    def __init__(self, conversation):
-        super().__init__()
-        self.conversation = conversation
-
-    def run(self):
-        try:
-            response = requests.post(
-                "http://localhost:11434/api/chat",
-                json={
-                    "model": "llama3",
-                    "messages": self.conversation,
-                    "stream": True
-                },
-                stream=True
-            )
-
-            full_reply = ""
-            for line in response.iter_lines():
-                if line:
-                    data = json.loads(line.decode("utf-8"))
-                    full_reply += data.get("message", {}).get("content", "")
-            self.result_ready.emit(full_reply.strip())
-
-        except Exception as e:
-            self.error.emit(str(e))
 
 
 class ShaunBot(QWidget):
