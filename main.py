@@ -1,5 +1,6 @@
 import sys
 import json
+import random
 from pathlib import Path
 from worker import OllamaWorker
 from PyQt5.QtGui import QFont
@@ -54,7 +55,21 @@ class ShaunBot(QWidget):
         ]
 
     def setup_ui(self):
-        self.setWindowTitle("Shaunbot 🤖")
+        taglines = [
+            "Now with more sarcasm!",
+            "100% caffeine-free hahahahaha not really",
+            "Built with loveeee",
+            "Probably still learning",
+            "Not a real therapist",
+            "Bit by a Python!",
+            "Am I alive?",
+            "Still typing...",
+            "How many hours did YOU sleep?",
+            "Behold! A futurist!"
+        ]
+
+        self.setWindowTitle(f"Shaunbot – {random.choice(taglines)}")
+
         self.setGeometry(200, 200, 800, 600)
 
         # Sidebar widgets
