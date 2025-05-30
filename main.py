@@ -4,6 +4,7 @@ import random
 from pathlib import Path
 from worker import OllamaWorker
 from PyQt5.QtGui import QFont
+from ui_elements import create_sidebar_buttons
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap
@@ -73,22 +74,15 @@ class ShaunBot(QWidget):
         self.setGeometry(200, 200, 800, 600)
 
         # Sidebar widgets
-        self.save_button = QPushButton("Save Chat")
-        self.save_button.clicked.connect(self.save_chat)
+        buttons = create_sidebar_buttons(self)
 
-        self.load_chat_button = QPushButton("Load Chat")
-        self.load_chat_button.clicked.connect(self.load_chat)
-
-        self.load_button = QPushButton("Load Knowledge File")
-        self.load_button.clicked.connect(self.load_knowledge_file)
-
-        self.mode_selector = QComboBox()
-        self.mode_selector.addItems([
-            "Chill Mode 😎", "Tech Support 🛠️", "Motivator 💪", "Dad Joke Bot 👴"
-        ])
-
-        self.model_selector = QComboBox()
-        self.model_selector.addItems(["llama3", "mistral", "llama2"])
+        self.save_button = buttons["save"]
+        self.load_chat_button = buttons["load_chat"]
+        self.load_button = buttons["load_knowledge"]
+        self.clear_button = buttons["clear"]
+        self.history_button = buttons["history"]
+        self.mode_selector = buttons["mode"]
+        self.model_selector = buttons["model"]
 
         self.clear_button = QPushButton("Clear Chat")
         self.clear_button.clicked.connect(self.clear_chat)
